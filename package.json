@@ -1,0 +1,22 @@
+{
+  "name": "slackplus",
+  "version": "1.0.0",
+  "description": "A simple script to inject JavaScript into Slack",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {},
+  "keywords": [
+    "Electron",
+    "Slack",
+    "Slack Mod",
+    "Mod"
+  ],
+  "author": "Geri",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^3.3.1",
+    "ps-node": "^0.1.6",
+    "request": "^2.88.2",
+    "ws": "^8.13.0"
+  }
+}
