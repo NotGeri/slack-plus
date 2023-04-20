@@ -3,9 +3,18 @@ import WebSocket from 'ws';
 import {spawn} from 'child_process';
 
 const config = {
-    port: 12345, // Define a custom port here
+    port: null, // Define a custom port here
     debug: false
 };
+
+// Attempt to get a free port to use for the debugger sockets
+if (!config.port) {
+    config.port = await Utils.getFreePort();
+    if (!config.port) {
+        console.error('Unable to find free port!');
+        process.exit(1);
+    }
+}
 
 // Get the Slack executable's path
 const exePath = Utils.getSlackLocation();

@@ -6,6 +6,9 @@ import * as net from 'net';
 
 export default class Utils {
 
+    static MINIMUM_TCP_PORT = 1024;
+    static MAXIMUM_TCP_PORT = 65535;
+
     /**
      * Search for a specific task kill any processes that are found
      * @param name The name of the process
@@ -127,5 +130,51 @@ export default class Utils {
 
         return scripts;
     };
-    
+
+    /**
+     * Attempt to get a free port by starting our own temporary server on it
+     * This will recursively try ports between your minimum port and the max TCP one
+     * @param startPort The minimum port to try, 1024 by default
+     * @returns {Promise<null|number>} A free port or null if there were none free in that range
+     */
+    static getFreePort = async (startPort = this.MINIMUM_TCP_PORT) => {
+        const server = net.createServer();
+
+        /**
+         * Helper function to wrap the listen function into a promise
+         * @param server The server to listen for
+         * @param port The port ot listen on
+         * @returns {Promise<unknown>}
+         */
+        const listen = (server, port) => {
+            return new Promise((resolve, reject) => {
+                // Listen to errors and reject if we see any
+                server.on('error', err => {
+                    reject(err);
+                });
+
+                // Attempt to start temporary server on the port
+                server.listen(port, err => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+        };
+
+        // Attempt to listen on ports until one works
+        let port = startPort;
+        while (port < this.MAXIMUM_TCP_PORT) {
+            console.info(`Trying port ${port}..`);
+
+            try {
+                await listen(server, port);
+                server.close();
+                return port;
+            } catch (err) {
+                port++;
+            }
+        }
+
+        return null;
+    };
 }
