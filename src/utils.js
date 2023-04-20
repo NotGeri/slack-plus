@@ -72,7 +72,7 @@ export default class Utils {
     };
 
     /**
-     * Attempt to get all Electron debugger websockets
+     * Attempt to collect all Electron debugger websockets
      * @param port The port of the Electron remote debugger
      * @param maxAttempts The amount of times we should try before giving up
      * @param data
@@ -97,20 +97,21 @@ export default class Utils {
                 }
             }
 
-            // No socket found, let us handle it as an error
-            // Todo (notgeri):
-            throw new Error('No websockets found in response');
+            // We have all the sockets we need
+            if (Object.keys(data.sockets).length >= 2) return data.sockets;
 
         } catch (e) {
-            // See if we should try again in a sec
-            if (data.attemptCount < maxAttempts) {
-                await Utils.sleep(1000);
-                data.attemptCount++;
-                return this.getElectronSockets(port, maxAttempts, data);
-            }
-
-            return data.sockets;
+            // We do not care
         }
+
+        // See if we should try again in a sec
+        if (data.attemptCount < maxAttempts) {
+            await Utils.sleep(1000);
+            data.attemptCount++;
+            return this.getElectronSockets(port, maxAttempts, data);
+        }
+
+        return data.sockets;
     };
 
     /**
